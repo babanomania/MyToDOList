@@ -2,7 +2,6 @@ package com.babanomania.mytodolist.activities;
 
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -11,7 +10,7 @@ import android.widget.EditText;
 
 import com.babanomania.mytodolist.R;
 import com.babanomania.mytodolist.models.TaskBean;
-import com.babanomania.mytodolist.persistance.DatabaseHandler;
+import com.babanomania.mytodolist.persistance.TaskManager;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -21,6 +20,7 @@ public class AddTasksActivity extends AppCompatActivity {
     private Pattern pattern;
     private Matcher matcher;
     private static final String DATE_PATTERN = "(0?[1-9]|[12][0-9]|3[01])/(0?[1-9]|1[012])/((19|20)\\d\\d)";
+    private static TaskManager taskManager = TaskManager.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,10 +63,12 @@ public class AddTasksActivity extends AppCompatActivity {
                 final EditText edDesc = (EditText) findViewById(R.id.newdesc);
                 final EditText edDate = (EditText) findViewById(R.id.newDate);
 
-                DatabaseHandler db = new DatabaseHandler(view.getContext());
-                db.addTask(new TaskBean( edTitle.getText().toString(),
-                                         edDesc.getText().toString() ,
-                                         edDate.getText().toString() ));
+                taskManager.addTask( new TaskBean(   edTitle.getText().toString(),
+                                                    edDesc.getText().toString() ,
+                                                    edDate.getText().toString() ),
+                                    view.getContext()
+                        );
+
                 finish();
 
             }

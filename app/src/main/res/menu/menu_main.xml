@@ -1,10 +1,18 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.babanomania.mytodolist.activities.MainActivity">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
     <item
-        android:id="@+id/action_settings"
-        android:orderInCategory="100"
-        android:title="@string/action_settings"
-        app:showAsAction="never" />
+        android:id="@+id/action_remove_all"
+        android:icon="@android:drawable/ic_menu_delete"
+        android:orderInCategory="10"
+        android:title="@string/action_remove_all"
+        app:showAsAction="collapseActionView" />
+
+    <item
+        android:id="@+id/action_add_test_data"
+        android:icon="@android:drawable/ic_menu_add"
+        android:orderInCategory="11"
+        android:title="@string/action_add_test_data"
+        app:showAsAction="collapseActionView" />
+
 </menu>

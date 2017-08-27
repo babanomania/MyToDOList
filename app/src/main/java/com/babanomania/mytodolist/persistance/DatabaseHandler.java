@@ -37,9 +37,8 @@ public class DatabaseHandler extends SQLiteOpenHelper {
                 + KEY_TITLE + " TEXT, "
                 + KEY_DESC+ " TEXT, "
                 + KEY_DATE + " TEXT )";
-        db.execSQL(CREATE_TASKS_TABLE);
 
-        prepareTasksData(this);
+        db.execSQL(CREATE_TASKS_TABLE);
     }
 
     @Override
@@ -66,6 +65,26 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
     }
 
+    public void addTask( List<TaskBean> taskList) {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        for (TaskBean task: taskList) {
+
+            ContentValues values = new ContentValues();
+            values.put(KEY_TITLE, task.getTitle());
+            values.put(KEY_DESC, task.getDescription());
+            values.put(KEY_DATE, task.getDate());
+
+            // Inserting Row
+            db.insert(TABLE_TASKS, null, values);
+
+        }
+
+        db.close(); // Closing database connection
+
+    }
+
     public TaskBean getTask(int id) {
 
         SQLiteDatabase db = this.getReadableDatabase();
@@ -73,6 +92,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         Cursor cursor = db.query(TABLE_TASKS,
                 new String[] { KEY_ID, KEY_TITLE, KEY_DESC, KEY_DATE }, KEY_ID + "=?",
                 new String[] { String.valueOf(id) }, null, null, null, null);
+
         if (cursor != null)
             cursor.moveToFirst();
 
@@ -123,24 +143,11 @@ public class DatabaseHandler extends SQLiteOpenHelper {
         db.close();
     }
 
-    private void prepareTasksData(DatabaseHandler db) {
+    public void deleteAllTasks(){
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_TASKS, null, null);
 
-        db.addTask(new TaskBean("Mad Max: Fury Road", "Action & Adventure", "2015"));
-        db.addTask(new TaskBean("Inside Out", "Animation, Kids & Family", "2015"));
-        db.addTask(new TaskBean("Star Wars: Episode VII - The Force Awakens", "Action", "2015"));
-        db.addTask(new TaskBean("Shaun the Sheep", "Animation", "2015"));
-        db.addTask(new TaskBean("The Martian", "Science Fiction & Fantasy", "2015"));
-        db.addTask(new TaskBean("Mission: Impossible Rogue Nation", "Action", "2015"));
-        db.addTask(new TaskBean("Up", "Animation", "2009"));
-        db.addTask(new TaskBean("Star Trek", "Science Fiction", "2009"));
-        db.addTask(new TaskBean("The LEGO Movie", "Animation", "2014"));
-        db.addTask(new TaskBean("Iron Man", "Action & Adventure", "2008"));
-        db.addTask(new TaskBean("Aliens", "Science Fiction", "1986"));
-        db.addTask(new TaskBean("Chicken Run", "Animation", "2000"));
-        db.addTask(new TaskBean("Back to the Future", "Science Fiction", "1985"));
-        db.addTask(new TaskBean("Raiders of the Lost Ark", "Action & Adventure", "1981"));
-        db.addTask(new TaskBean("Goldfinger", "Action & Adventure", "1965"));
-        db.addTask(new TaskBean("Guardians of the Galaxy", "Science Fiction & Fantasy", "2014"));
-
+        db.close();
     }
+
 }
