@@ -93,22 +93,11 @@ public class TaskManager {
 
         List<TaskBean> tasksList = new ArrayList<TaskBean>();
 
-        tasksList.add(new TaskBean("Mad Max: Fury Road", "Action & Adventure", "2015"));
-        tasksList.add(new TaskBean("Inside Out", "Animation, Kids & Family", "2015"));
-        tasksList.add(new TaskBean("Star Wars: Episode VII - The Force Awakens", "Action", "2015"));
-        tasksList.add(new TaskBean("Shaun the Sheep", "Animation", "2015"));
-        tasksList.add(new TaskBean("The Martian", "Science Fiction & Fantasy", "2015"));
-//        tasksList.add(new TaskBean("Mission: Impossible Rogue Nation", "Action", "2015"));
-//        tasksList.add(new TaskBean("Up", "Animation", "2009"));
-//        tasksList.add(new TaskBean("Star Trek", "Science Fiction", "2009"));
-//        tasksList.add(new TaskBean("The LEGO Movie", "Animation", "2014"));
-//        tasksList.add(new TaskBean("Iron Man", "Action & Adventure", "2008"));
-//        tasksList.add(new TaskBean("Aliens", "Science Fiction", "1986"));
-//        tasksList.add(new TaskBean("Chicken Run", "Animation", "2000"));
-//        tasksList.add(new TaskBean("Back to the Future", "Science Fiction", "1985"));
-//        tasksList.add(new TaskBean("Raiders of the Lost Ark", "Action & Adventure", "1981"));
-//        tasksList.add(new TaskBean("Goldfinger", "Action & Adventure", "1965"));
-//        tasksList.add(new TaskBean("Guardians of the Galaxy", "Science Fiction & Fantasy", "2014"));
+        tasksList.add(new TaskBean("Create an todo app", "ToDo", "17/08/2017"));
+        tasksList.add(new TaskBean("Tell others to use this todo app", "ToDo", "28/08/2017"));
+        tasksList.add(new TaskBean("Make plans for a mind control device", "EvilPlan, Future", "01/01/2021"));
+        tasksList.add(new TaskBean("Create the mind control device", "EvilPlan, Future", "31/12/2021"));
+        tasksList.add(new TaskBean("Use the mind control device to rule the world", "EvilPlan, RuleTheWorld", "01/01/2022"));
 
         addTask(context, tasksList);
     }

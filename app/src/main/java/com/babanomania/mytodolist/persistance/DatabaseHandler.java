@@ -56,7 +56,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
         ContentValues values = new ContentValues();
         values.put(KEY_TITLE, task.getTitle());
-        values.put(KEY_DESC, task.getDescription());
+        values.put(KEY_DESC, task.getLabels());
         values.put(KEY_DATE, task.getDate());
 
         // Inserting Row
@@ -73,7 +73,7 @@ public class DatabaseHandler extends SQLiteOpenHelper {
 
             ContentValues values = new ContentValues();
             values.put(KEY_TITLE, task.getTitle());
-            values.put(KEY_DESC, task.getDescription());
+            values.put(KEY_DESC, task.getLabels());
             values.put(KEY_DATE, task.getDate());
 
             // Inserting Row

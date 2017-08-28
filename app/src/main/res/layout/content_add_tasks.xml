@@ -13,7 +13,8 @@
     <android.support.design.widget.TextInputLayout
         android:id="@+id/input_title"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:paddingTop="50px">
 
         <EditText
             android:id="@+id/newtitle"
@@ -25,25 +26,25 @@
     </android.support.design.widget.TextInputLayout>
 
     <android.support.design.widget.TextInputLayout
-        android:id="@+id/input_desc"
+        android:id="@+id/input_labels"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:paddingTop="50px">
 
         <EditText
-            android:id="@+id/newdesc"
+            android:id="@+id/newlabels"
             android:layout_width="match_parent"
-            android:layout_height="76dp"
+            android:layout_height="wrap_content"
             android:layout_marginTop="150px"
-            android:layout_weight="0.08"
-            android:hint="Description *"
-            android:inputType="textMultiLine" />
+            android:hint="Labels ( e.g. todo, bucketlist ) *" />
 
     </android.support.design.widget.TextInputLayout>
 
     <android.support.design.widget.TextInputLayout
         android:id="@+id/input_date"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:paddingTop="50px">
 
         <AutoCompleteTextView
             android:id="@+id/newDate"

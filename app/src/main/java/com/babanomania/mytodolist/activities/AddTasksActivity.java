@@ -37,21 +37,21 @@ public class AddTasksActivity extends AppCompatActivity {
             edTitle.setError( "title is mandatory" );
         }
 
-        final EditText edDesc = (EditText) findViewById(R.id.newdesc);
-        if( edDesc.getText() == null || edDesc.getText().toString() == null || edDesc.getText().toString().length() <= 0 ){
-            edDesc.setError( "description is mandatory" );
+        final EditText edLabels = (EditText) findViewById(R.id.newlabels);
+        if( edLabels.getText() == null || edLabels.getText().toString() == null || edLabels.getText().toString().length() <= 0 ){
+            edLabels.setError( "Labels are mandatory" );
         }
 
         final EditText edDate = (EditText) findViewById(R.id.newDate);
         if( edDate.getText() == null || edDate.getText().toString() == null || edDate.getText().toString().length() <= 0 ){
-            edDate.setError( "date is mandatory" );
+            edDate.setError( "target date is mandatory" );
         }
 
         pattern = Pattern.compile(DATE_PATTERN);
         matcher = pattern.matcher(edDate.getText().toString());
         if(!matcher.matches()){
             matcher.reset();
-            edDate.setError( "date should be in format dd/mm/yyyy" );
+            edDate.setError( "target date should be in format dd/mm/yyyy" );
         }
 
         Button btnSave = (Button) findViewById(R.id.save);
@@ -60,7 +60,7 @@ public class AddTasksActivity extends AppCompatActivity {
             public void onClick(View view) {
 
                 final EditText edTitle = (EditText) findViewById(R.id.newtitle);
-                final EditText edDesc = (EditText) findViewById(R.id.newdesc);
+                final EditText edDesc = (EditText) findViewById(R.id.newlabels);
                 final EditText edDate = (EditText) findViewById(R.id.newDate);
 
                 taskManager.addTask( new TaskBean(   edTitle.getText().toString(),

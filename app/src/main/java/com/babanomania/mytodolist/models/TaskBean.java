@@ -1,7 +1,5 @@
 package com.babanomania.mytodolist.models;
 
-import java.util.Objects;
-
 /**
  * Created by Shouvik on 23/08/2017.
  */
@@ -9,18 +7,18 @@ import java.util.Objects;
 public class TaskBean {
 
     private int _id;
-    private String title, description, date;
+    private String title, labels, date;
 
-    public TaskBean( String pTitle, String pDescription, String pDate ){
+    public TaskBean( String pTitle, String pLabels, String pDate ){
         this.title = pTitle;
-        this.description = pDescription;
+        setLabels(pLabels);
         this.date = pDate;
     }
 
-    public TaskBean(int _id, String pTitle, String pDescription, String pDate ) {
+    public TaskBean(int _id, String pTitle, String pLabels, String pDate ) {
         this._id = _id;
         this.title = pTitle;
-        this.description = pDescription;
+        setLabels(pLabels);
         this.date = pDate;
     }
 
@@ -40,12 +38,29 @@ public class TaskBean {
         this.title = title;
     }
 
-    public String getDescription() {
-        return description;
+    public String getLabels() {
+        return labels;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setLabels(String labels) {
+
+        StringBuffer allLabels = new StringBuffer();
+        if( labels.contains( "," ) ){
+
+            String[] labels_all = labels.split(",");
+            for (String eachLabel : labels_all){
+
+                if( eachLabel != null ){
+                    allLabels.append( "#" + eachLabel.trim() + "  ");
+                }
+
+            }
+
+        } else {
+            allLabels.append( "#" + labels );
+        }
+
+        this.labels = allLabels.toString();
     }
 
     public String getDate() {
@@ -58,7 +73,7 @@ public class TaskBean {
 
     @Override
     public String toString() {
-        return this.title + " - " + this.getDescription() + " - " + this.getDate();
+        return this.title + " - " + this.getLabels() + " - " + this.getDate();
     }
 
     @Override

@@ -1,10 +1,8 @@
 package com.babanomania.mytodolist.recycleViewUtil;
 
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,21 +26,16 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.MyViewHolder> 
     public class MyViewHolder extends RecyclerView.ViewHolder {
 
         public TextView title, desc, date;
+        public View rowView;
 
         public MyViewHolder(View view) {
             super(view);
             title = (TextView) view.findViewById(R.id.title);
-            desc = (TextView) view.findViewById(R.id.desc);
+            desc = (TextView) view.findViewById(R.id.labels);
             date = (TextView) view.findViewById(R.id.date);
+            this.rowView = view;
         }
 
-        public void setSelected() {
-            itemView.setBackgroundColor(Color.parseColor("gray"));
-        }
-
-        public void setUnSelected() {
-            super.itemView.setBackgroundColor(Color.parseColor("white"));
-        }
     }
 
     public TaskAdapter(List<TaskBean> pTasksList) {
@@ -64,17 +57,19 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.MyViewHolder> 
 
         TaskBean task = tasksList.get(position);
         holder.title.setText(task.getTitle());
-        holder.desc.setText(task.getDescription());
+        holder.desc.setText(task.getLabels());
         holder.date.setText(task.getDate());
 
         if( taskManager.isSelected(task) ){
 
-            holder.setSelected();
+            holder.rowView.setBackgroundColor(Color.parseColor("GRAY"));
+            holder.rowView.setSelected(true);
             Log.d( "MyTODOList", "SetSelected - " + task.getTitle() );
 
         } else {
 
-            holder.setUnSelected();
+            holder.rowView.setBackgroundColor(Color.parseColor("WHITE"));
+            holder.rowView.setSelected(false);
             Log.d( "MyTODOList", "NOT-SetSelected - " + task.getTitle() );
         }
 

@@ -61,11 +61,11 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onClick(View view, int position) {
-//                TaskBean task = taskManager.get(position);
-//                Toast.makeText(getApplicationContext(), task.getTitle() + " is selected!", Toast.LENGTH_SHORT).show();
-                if (mActionMode != null)
-                    onListItemSelect(position);
 
+                if( mActionMode == null ) {
+                    TaskBean task = taskManager.get(position);
+                    Toast.makeText(getApplicationContext(), task.getTitle() + " is selected!", Toast.LENGTH_SHORT).show();
+                }
             }
 
             @Override
@@ -139,7 +139,6 @@ public class MainActivity extends AppCompatActivity {
             //set action mode title on item selection
             mActionMode.setTitle(String.valueOf(taskManager.getSelectedCount()) + " selected");
         }
-
 
     }
 
