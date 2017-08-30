@@ -19,7 +19,6 @@ public class TaskManager {
     private static TaskManager instance = new TaskManager();
     private RecyclerView.Adapter mAdapter;
 
-
     private static List<TaskBean> selectedTasks = new ArrayList<TaskBean>();
 
     public static TaskManager getInstance() {
@@ -27,10 +26,10 @@ public class TaskManager {
     }
 
     public List<TaskBean> getTaskList(Context context) {
-//
-//        DatabaseHandler db = new DatabaseHandler(context);
-//        taskList.clear();
-//        taskList.addAll( db.getAllTasks() );
+
+        DatabaseHandler db = new DatabaseHandler(context);
+        taskList.clear();
+        taskList.addAll( db.getAllTasks() );
 
         return taskList;
     }
@@ -42,22 +41,22 @@ public class TaskManager {
     public void addTask(TaskBean task, Context context){
 
         taskList.add(task);
-//
-//        DatabaseHandler db = new DatabaseHandler(context);
-//        db.addTask(task);
+
+        DatabaseHandler db = new DatabaseHandler(context);
+        db.addTask(task);
 
         if( mAdapter != null ){
             mAdapter.notifyItemInserted( taskList.size() - 1 );
-            //mAdapter.notifyDataSetChanged();
+           // mAdapter.notifyDataSetChanged();
         }
     }
 
     public void addTask(Context context, List<TaskBean> tasks){
 
         taskList.addAll(tasks);
-//
-//        DatabaseHandler db = new DatabaseHandler(context);
-//        db.addTask(taskList);
+
+        DatabaseHandler db = new DatabaseHandler(context);
+        db.addTask(tasks);
 
         if( mAdapter != null ){
             mAdapter.notifyDataSetChanged();
@@ -69,6 +68,9 @@ public class TaskManager {
     }
 
     public void deleteTask( int position, Context context){
+
+        DatabaseHandler db = new DatabaseHandler(context);
+        db.deleteTask( taskList.get(position) );
         taskList.remove(position);
 
         if( mAdapter != null ){
@@ -78,6 +80,9 @@ public class TaskManager {
     }
 
     public void deleteAllTasks( Context context){
+
+        DatabaseHandler db = new DatabaseHandler(context);
+        db.deleteAllTasks();
         taskList.clear();
 
         if( mAdapter != null ){
@@ -121,8 +126,12 @@ public class TaskManager {
 
     public void deleteSelectedRows( Context context ){
 
-        for( TaskBean selTask : selectedTasks )
-            taskList.remove( taskList.indexOf(selTask) );
+        DatabaseHandler db = new DatabaseHandler(context);
+
+        for( TaskBean selTask : selectedTasks ) {
+            db.deleteTask(selTask);
+            taskList.remove(taskList.indexOf(selTask));
+        }
 
         int selectedSize = selectedTasks.size();
         selectedTasks.clear();

@@ -1,5 +1,8 @@
 package com.babanomania.mytodolist.models;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by Shouvik on 23/08/2017.
  */
@@ -7,7 +10,8 @@ package com.babanomania.mytodolist.models;
 public class TaskBean {
 
     private int _id;
-    private String title, labels, date;
+    private String title, date;
+    private List<String> labels = new ArrayList<String>();
 
     public TaskBean( String pTitle, String pLabels, String pDate ){
         this.title = pTitle;
@@ -15,7 +19,7 @@ public class TaskBean {
         this.date = pDate;
     }
 
-    public TaskBean(int _id, String pTitle, String pLabels, String pDate ) {
+    public TaskBean(int _id, String pTitle, List<String> pLabels, String pDate ) {
         this._id = _id;
         this.title = pTitle;
         setLabels(pLabels);
@@ -38,29 +42,42 @@ public class TaskBean {
         this.title = title;
     }
 
-    public String getLabels() {
-        return labels;
-    }
-
-    public void setLabels(String labels) {
+    public void setLabels(String pLabels) {
 
         StringBuffer allLabels = new StringBuffer();
-        if( labels.contains( "," ) ){
+        if( pLabels.contains( "," ) ){
 
-            String[] labels_all = labels.split(",");
+            String[] labels_all = pLabels.split(",");
             for (String eachLabel : labels_all){
 
                 if( eachLabel != null ){
-                    allLabels.append( "#" + eachLabel.trim() + "  ");
+                    labels.add(eachLabel.trim());
                 }
 
             }
 
         } else {
-            allLabels.append( "#" + labels );
+            labels.add( pLabels );
         }
 
-        this.labels = allLabels.toString();
+    }
+
+    public List<String> getLabels() {
+        return labels;
+    }
+
+    public String getHashedLabels(){
+
+        StringBuffer hashedLabels = new StringBuffer();
+        for( String label : labels ){
+            hashedLabels.append( "#" + label + " " );
+        }
+
+        return hashedLabels.toString();
+    }
+
+    public void setLabels(List<String> labels) {
+        this.labels = labels;
     }
 
     public String getDate() {

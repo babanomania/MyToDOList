@@ -57,7 +57,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.MyViewHolder> 
 
         TaskBean task = tasksList.get(position);
         holder.title.setText(task.getTitle());
-        holder.desc.setText(task.getLabels());
+        holder.desc.setText(task.getHashedLabels());
         holder.date.setText(task.getDate());
 
         if( taskManager.isSelected(task) ){
