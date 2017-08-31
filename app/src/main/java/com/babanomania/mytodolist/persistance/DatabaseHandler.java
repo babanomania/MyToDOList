@@ -19,6 +19,7 @@ import com.babanomania.mytodolist.models.TaskDao;
 import org.greenrobot.greendao.database.Database;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -39,6 +40,17 @@ public class DatabaseHandler {
         DaoSession daoSession = getDaoSession(context);
         TaskDao taskDao = daoSession.getTaskDao();
         return taskDao.queryBuilder().list();
+    }
+
+    public List<Task> getTasksByDate(Context context, Date pDate){
+
+        DaoSession daoSession = getDaoSession(context);
+        TaskDao taskDao = daoSession.getTaskDao();
+        return taskDao.queryBuilder()
+                        .where( TaskDao.Properties.Date.le(
+                                pDate
+                        ))
+                        .list();
     }
 
 
@@ -146,7 +158,12 @@ public class DatabaseHandler {
         daoSession.getTaskDao().deleteAll();
         daoSession.getDatabase().setTransactionSuccessful();
         daoSession.getDatabase().endTransaction();
+    }
 
+    public List<Label> getLabels(Context context){
 
+        DaoSession daoSession = getDaoSession(context);
+        LabelDao labelDao = daoSession.getLabelDao();
+        return labelDao.queryBuilder().list();
     }
 }

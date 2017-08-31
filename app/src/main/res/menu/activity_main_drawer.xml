@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:title="Pending Tasks" android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_today"
+            android:icon="@drawable/ic_menu_cal"
+            android:title="Today" />
+        <item
+            android:id="@+id/nav_week"
+            android:icon="@drawable/ic_menu_cal"
+            android:title="This Week" />
+        <item
+            android:id="@+id/nav_month"
+            android:icon="@drawable/ic_menu_cal"
+            android:title="This Month" />
+    </group>
+
+    <item android:title="Labels" android:id="@+id/nav_menu_labels">
+        <menu>
+            <item
+                android:id="@+id/nav_share"
+                android:icon="@drawable/ic_menu_label"
+                android:title="Share" />
+            <item
+                android:id="@+id/nav_send"
+                android:icon="@drawable/ic_menu_label"
+                android:title="Send" />
+        </menu>
+    </item>
+
+</menu>

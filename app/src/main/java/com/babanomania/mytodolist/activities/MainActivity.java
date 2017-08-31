@@ -4,6 +4,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -15,6 +19,7 @@ import android.view.MenuItem;
 import android.support.v7.widget.RecyclerView;
 import android.widget.Toast;
 
+import com.babanomania.mytodolist.core.Navbar_ActionMode_Callback;
 import com.babanomania.mytodolist.persistance.TaskManager;
 import com.babanomania.mytodolist.core.ClickListener;
 import com.babanomania.mytodolist.core.DividerItemDecoration;
@@ -24,7 +29,7 @@ import com.babanomania.mytodolist.core.MainAdapter;
 import com.babanomania.mytodolist.models.Task;
 import com.babanomania.mytodolist.core.Toolbar_ActionMode_Callback;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private RecyclerView mRecyclerView;
     private MainAdapter mAdapter;
@@ -32,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static TaskManager taskManager = TaskManager.getInstance();
     private static ActionMode mActionMode;
+    private static ActionMode mActionModeNav;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,8 +47,8 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
         mRecyclerView = (RecyclerView) findViewById(R.id.rv_todo_list);
-
         mAdapter = new MainAdapter(taskManager.getTaskList(getBaseContext()));
+        
         taskManager.setAdapter(mAdapter);
 
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
@@ -72,6 +78,14 @@ public class MainActivity extends AppCompatActivity {
         }));
 
         //mAdapter.notifyDataSetChanged();
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -147,6 +161,63 @@ public class MainActivity extends AppCompatActivity {
 
         taskManager.deleteSelectedRows(context);
         mActionMode.finish();//Finish action mode after use
+    }
+
+    @Override
+    public void onBackPressed() {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
+
+        if( ( mActionModeNav == null ) && ( mActionMode == null ) ){
+            mActionModeNav.finish();
+            mActionModeNav = null;
+            taskManager.filterData(this, TaskManager.FilterByCal.today);
+        }
+    }
+
+    @SuppressWarnings("StatementWithEmptyBody")
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        // Handle navigation view item clicks here.
+        int id = item.getItemId();
+
+        String titleActionMode = "";
+        if (id == R.id.nav_today) {
+            taskManager.filterData(this, TaskManager.FilterByCal.today);
+            titleActionMode = "Pending Today";
+
+        } else if (id == R.id.nav_week) {
+            taskManager.filterData(this, TaskManager.FilterByCal.this_week);
+            titleActionMode = "Pending This Week";
+
+        } else if (id == R.id.nav_month) {
+            taskManager.filterData(this, TaskManager.FilterByCal.this_month);
+            titleActionMode = "Pending This Month";
+        }
+
+        if( mActionModeNav != null ) {
+            mActionModeNav.finish();
+            mActionModeNav = null;
+        }
+
+        mActionModeNav = ((AppCompatActivity) this)
+                            .startSupportActionMode(
+                                    new Navbar_ActionMode_Callback(this, mAdapter,
+                                            taskManager.getTaskListOnly(getBaseContext()), false)
+                            );
+
+        mActionModeNav.setTitle(titleActionMode);
+
+        mAdapter.notifyDataSetChanged();
+        item.setChecked(true);
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
     }
 
 }

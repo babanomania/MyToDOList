@@ -12,6 +12,7 @@ import com.babanomania.mytodolist.models.LabelTaskMap;
 import com.babanomania.mytodolist.models.LabelTaskMapDao;
 import com.babanomania.mytodolist.models.Task;
 import com.babanomania.mytodolist.models.TaskDao;
+import com.babanomania.mytodolist.util.DateUtil;
 import com.babanomania.mytodolist.util.EntityUtil;
 
 import org.greenrobot.greendao.database.Database;
@@ -35,6 +36,13 @@ public class TaskManager {
 
     private DatabaseHandler dbHandler = new DatabaseHandler();
 
+    public static enum FilterByCal {
+        all,
+        today,
+        this_week,
+        this_month;
+    }
+
     public static TaskManager getInstance() {
         return instance;
     }
@@ -44,6 +52,37 @@ public class TaskManager {
         synchronized (this) {
             taskList.clear();
             taskList.addAll(dbHandler.getTasks(context));
+        }
+
+        return taskList;
+    }
+
+    public List<Task> filterData(Context context, FilterByCal filterType) {
+
+        synchronized (this) {
+            taskList.clear();
+
+            if( filterType.equals( FilterByCal.all ) ) {
+                taskList.addAll(dbHandler.getTasks(context));
+
+            } else if( filterType.equals( FilterByCal.today ) ){
+                taskList.addAll(dbHandler.getTasksByDate(
+                                            context,
+                                            DateUtil.getTodaysDate()
+                                ));
+
+            } else if( filterType.equals( FilterByCal.this_week ) ){
+                taskList.addAll(dbHandler.getTasksByDate(
+                                            context,
+                                            DateUtil.getThisWeekendDate()
+                                ));
+
+            } else if( filterType.equals( FilterByCal.this_month ) ){
+                taskList.addAll(dbHandler.getTasksByDate(
+                                            context,
+                                            DateUtil.getThisMonthEndDate()
+                                ));
+            }
         }
 
         return taskList;
@@ -169,4 +208,7 @@ public class TaskManager {
         selectedTasks.clear();
     }
 
+    public List<Label> getLabels(Context context) {
+        return dbHandler.getLabels(context);
+    }
 }

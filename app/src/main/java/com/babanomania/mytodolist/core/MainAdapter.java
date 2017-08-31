@@ -1,5 +1,6 @@
 package com.babanomania.mytodolist.core;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -83,6 +84,11 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.MyViewHolder> 
 
     public void removeSelection(){
         taskManager.clearSelection();
+        notifyDataSetChanged();
+    }
+
+    public void selectAllTasks(Context context){
+        taskManager.filterData(context, TaskManager.FilterByCal.all);
         notifyDataSetChanged();
     }
 
