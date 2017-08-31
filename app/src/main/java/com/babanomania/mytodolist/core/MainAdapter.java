@@ -60,7 +60,7 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.MyViewHolder> 
     }
 
     @Override
-    public void onBindViewHolder(MyViewHolder holder, int position) {
+    public void onBindViewHolder(final MyViewHolder holder, int position) {
 
         final Task task = tasksList.get(position);
         holder.title.setText(task.getTitle());
@@ -99,7 +99,16 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.MyViewHolder> 
                                 taskManager.updateTask(view.getContext(), task);
                             }
                         })
-                        .setNegativeButton("No", null)						//Do nothing on no
+                        .setNegativeButton("No", new DialogInterface.OnClickListener(){
+                            public void onClick(DialogInterface dialog, int which) {
+                                if( checked ){
+                                    holder.isCompleted.setChecked(false);
+                                } else {
+                                    holder.isCompleted.setChecked(true);
+                                }
+
+                            }
+                        })						//Do nothing on no
                         .show();
             }
         });
