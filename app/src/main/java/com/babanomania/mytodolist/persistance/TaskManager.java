@@ -4,23 +4,16 @@ import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.widget.Toast;
 
-import com.babanomania.mytodolist.models.DaoMaster;
-import com.babanomania.mytodolist.models.DaoSession;
 import com.babanomania.mytodolist.models.Label;
-import com.babanomania.mytodolist.models.LabelDao;
-import com.babanomania.mytodolist.models.LabelTaskMap;
-import com.babanomania.mytodolist.models.LabelTaskMapDao;
 import com.babanomania.mytodolist.models.Task;
-import com.babanomania.mytodolist.models.TaskDao;
 import com.babanomania.mytodolist.util.DateUtil;
 import com.babanomania.mytodolist.util.EntityUtil;
-
-import org.greenrobot.greendao.database.Database;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by Shouvik on 23/08/2017.
@@ -36,11 +29,12 @@ public class TaskManager {
 
     private DatabaseHandler dbHandler = new DatabaseHandler();
 
-    public static enum FilterByCal {
+    public static enum Filters {
         all,
         today,
         this_week,
-        this_month;
+        this_month,
+        LABELS;
     }
 
     public static TaskManager getInstance() {
@@ -57,30 +51,35 @@ public class TaskManager {
         return taskList;
     }
 
-    public List<Task> filterData(Context context, FilterByCal filterType) {
+    public List<Task> filterData(Context context, Filters filterType, String label) {
 
         synchronized (this) {
             taskList.clear();
 
-            if( filterType.equals( FilterByCal.all ) ) {
+            if( filterType.equals( Filters.all ) ) {
                 taskList.addAll(dbHandler.getTasks(context));
 
-            } else if( filterType.equals( FilterByCal.today ) ){
+            } else if( filterType.equals( Filters.today ) ){
                 taskList.addAll(dbHandler.getTasksByDate(
                                             context,
                                             DateUtil.getTodaysDate()
                                 ));
 
-            } else if( filterType.equals( FilterByCal.this_week ) ){
+            } else if( filterType.equals( Filters.this_week ) ){
                 taskList.addAll(dbHandler.getTasksByDate(
                                             context,
                                             DateUtil.getThisWeekendDate()
                                 ));
 
-            } else if( filterType.equals( FilterByCal.this_month ) ){
+            } else if( filterType.equals( Filters.this_month ) ){
                 taskList.addAll(dbHandler.getTasksByDate(
                                             context,
                                             DateUtil.getThisMonthEndDate()
+                                ));
+            } else if( filterType.equals( Filters.LABELS ) ){
+                taskList.addAll(dbHandler.getTasksByLabel(
+                                        context,
+                                        label
                                 ));
             }
         }
@@ -208,7 +207,7 @@ public class TaskManager {
         selectedTasks.clear();
     }
 
-    public List<Label> getLabels(Context context) {
+    public Set<String> getLabels(Context context) {
         return dbHandler.getLabels(context);
     }
 }

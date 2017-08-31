@@ -13,6 +13,7 @@ import android.support.v7.view.ActionMode;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.Toolbar;
+import android.view.SubMenu;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -28,6 +29,9 @@ import com.babanomania.mytodolist.core.RecyclerTouchListener;
 import com.babanomania.mytodolist.core.MainAdapter;
 import com.babanomania.mytodolist.models.Task;
 import com.babanomania.mytodolist.core.Toolbar_ActionMode_Callback;
+
+import java.util.List;
+import java.util.Set;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -48,7 +52,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         mRecyclerView = (RecyclerView) findViewById(R.id.rv_todo_list);
         mAdapter = new MainAdapter(taskManager.getTaskList(getBaseContext()));
-        
+
         taskManager.setAdapter(mAdapter);
 
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
@@ -86,6 +90,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        Menu navMenu = navigationView.getMenu();
+        SubMenu smLabels = navMenu.addSubMenu("Labels");
+        Set<String> allLabels = taskManager.getLabels(this);
+        for (String aLabel : allLabels){
+            smLabels.add(aLabel)
+                    .setIcon( R.drawable.ic_menu_label );
+        }
+        smLabels.add("Create Label")
+                .setIcon( R.drawable.ic_menu_plus );
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -175,7 +188,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if( ( mActionModeNav == null ) && ( mActionMode == null ) ){
             mActionModeNav.finish();
             mActionModeNav = null;
-            taskManager.filterData(this, TaskManager.FilterByCal.today);
+            taskManager.filterData(this, TaskManager.Filters.today, null);
         }
     }
 
@@ -187,16 +200,27 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         String titleActionMode = "";
         if (id == R.id.nav_today) {
-            taskManager.filterData(this, TaskManager.FilterByCal.today);
+            taskManager.filterData(this, TaskManager.Filters.today, null);
             titleActionMode = "Pending Today";
 
         } else if (id == R.id.nav_week) {
-            taskManager.filterData(this, TaskManager.FilterByCal.this_week);
+            taskManager.filterData(this, TaskManager.Filters.this_week, null);
             titleActionMode = "Pending This Week";
 
         } else if (id == R.id.nav_month) {
-            taskManager.filterData(this, TaskManager.FilterByCal.this_month);
+            taskManager.filterData(this, TaskManager.Filters.this_month, null);
             titleActionMode = "Pending This Month";
+
+        } else {
+
+            String menuTitle = item.getTitle().toString();
+            if( "Create Label".equals(menuTitle) ){
+                Toast.makeText(getApplicationContext(), "Label Karenge, Label Karenge", Toast.LENGTH_SHORT).show();
+
+            } else {
+                taskManager.filterData(this, TaskManager.Filters.LABELS, menuTitle.trim());
+                titleActionMode = "#" + menuTitle.trim();
+            }
         }
 
         if( mActionModeNav != null ) {

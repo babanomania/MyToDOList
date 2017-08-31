@@ -30,7 +30,7 @@ public class EntityUtil {
             for (String eachLabel : labels_all){
 
                 if( eachLabel != null ){
-                    Label labelObj = new Label(eachLabel);
+                    Label labelObj = new Label(eachLabel.trim());
                     allLabels.add(labelObj);
                 }
 

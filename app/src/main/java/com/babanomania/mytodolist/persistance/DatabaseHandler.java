@@ -20,8 +20,10 @@ import org.greenrobot.greendao.database.Database;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by Shouvik on 23/08/2017.
@@ -39,7 +41,9 @@ public class DatabaseHandler {
 
         DaoSession daoSession = getDaoSession(context);
         TaskDao taskDao = daoSession.getTaskDao();
-        return taskDao.queryBuilder().list();
+        return taskDao.queryBuilder()
+                        .orderAsc(TaskDao.Properties.Date)
+                        .list();
     }
 
     public List<Task> getTasksByDate(Context context, Date pDate){
@@ -47,12 +51,51 @@ public class DatabaseHandler {
         DaoSession daoSession = getDaoSession(context);
         TaskDao taskDao = daoSession.getTaskDao();
         return taskDao.queryBuilder()
-                        .where( TaskDao.Properties.Date.le(
-                                pDate
-                        ))
-                        .list();
+                .where( TaskDao.Properties.Date.le(
+                        pDate
+                ))
+                .orderAsc(TaskDao.Properties.Date)
+                .list();
     }
 
+    public List<Task> getTasksByLabel(Context context, String pLabel){
+
+        DaoSession daoSession = getDaoSession(context);
+        LabelDao labelDao = daoSession.getLabelDao();
+        List<Label> labels = labelDao.queryBuilder()
+                                        .where(LabelDao.Properties.Label.eq(
+                                            pLabel
+                                        ))
+                                        .list();
+
+        if( labels.isEmpty() ) return new ArrayList<Task>();
+
+        List<Long> labelsIds = new ArrayList<Long>();
+        for(Label eachLabel : labels ){
+            labelsIds.add(eachLabel.get_id());
+        }
+
+        LabelTaskMapDao lblTskMapDao  = daoSession.getLabelTaskMapDao();
+        List<LabelTaskMap> lbkTaskMaps = lblTskMapDao.queryBuilder()
+                                                        .where(LabelTaskMapDao.Properties.LabelId.in(
+                                                                labelsIds
+                                                        ))
+                                                        .list();
+        if( lbkTaskMaps.isEmpty() ) return new ArrayList<Task>();
+
+        List<Long> taskIds = new ArrayList<Long>();
+        for(LabelTaskMap eachLabelTaskMap : lbkTaskMaps ){
+            taskIds.add(eachLabelTaskMap.getTaskId());
+        }
+
+        TaskDao taskDao = daoSession.getTaskDao();
+        return taskDao.queryBuilder()
+                .where( TaskDao.Properties._id.in(
+                        taskIds
+                ))
+                .orderAsc(TaskDao.Properties.Date)
+                .list();
+    }
 
     public void addTask(Task task, List<Label> labels, Context context){
 
@@ -160,10 +203,17 @@ public class DatabaseHandler {
         daoSession.getDatabase().endTransaction();
     }
 
-    public List<Label> getLabels(Context context){
+    public Set<String> getLabels(Context context){
 
         DaoSession daoSession = getDaoSession(context);
         LabelDao labelDao = daoSession.getLabelDao();
-        return labelDao.queryBuilder().list();
+        List<Label> allLAbels =  labelDao.queryBuilder().list();
+
+        Set<String> strLabels = new HashSet<String>();
+        for( Label eachLabel : allLAbels ){
+            strLabels.add(eachLabel.getLabel().trim());
+        }
+
+        return strLabels;
     }
 }

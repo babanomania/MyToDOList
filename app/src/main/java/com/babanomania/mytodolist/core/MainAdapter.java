@@ -88,7 +88,7 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.MyViewHolder> 
     }
 
     public void selectAllTasks(Context context){
-        taskManager.filterData(context, TaskManager.FilterByCal.all);
+        taskManager.filterData(context, TaskManager.Filters.all, null);
         notifyDataSetChanged();
     }
 
