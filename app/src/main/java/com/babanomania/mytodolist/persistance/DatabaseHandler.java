@@ -42,6 +42,7 @@ public class DatabaseHandler {
         DaoSession daoSession = getDaoSession(context);
         TaskDao taskDao = daoSession.getTaskDao();
         return taskDao.queryBuilder()
+                        .where(TaskDao.Properties.IsCompleted.eq(false))
                         .orderAsc(TaskDao.Properties.Date)
                         .list();
     }
@@ -54,6 +55,17 @@ public class DatabaseHandler {
                 .where( TaskDao.Properties.Date.le(
                         pDate
                 ))
+                .where(TaskDao.Properties.IsCompleted.eq(false))
+                .orderAsc(TaskDao.Properties.Date)
+                .list();
+    }
+
+    public List<Task> getTasksCompleted(Context context){
+
+        DaoSession daoSession = getDaoSession(context);
+        TaskDao taskDao = daoSession.getTaskDao();
+        return taskDao.queryBuilder()
+                .where( TaskDao.Properties.IsCompleted.eq(true))
                 .orderAsc(TaskDao.Properties.Date)
                 .list();
     }
@@ -93,6 +105,7 @@ public class DatabaseHandler {
                 .where( TaskDao.Properties._id.in(
                         taskIds
                 ))
+                .where(TaskDao.Properties.IsCompleted.eq(false))
                 .orderAsc(TaskDao.Properties.Date)
                 .list();
     }
@@ -207,13 +220,19 @@ public class DatabaseHandler {
 
         DaoSession daoSession = getDaoSession(context);
         LabelDao labelDao = daoSession.getLabelDao();
-        List<Label> allLAbels =  labelDao.queryBuilder().list();
+        List<Label> allLabels =  labelDao.queryBuilder().list();
 
         Set<String> strLabels = new HashSet<String>();
-        for( Label eachLabel : allLAbels ){
+        for( Label eachLabel : allLabels ){
             strLabels.add(eachLabel.getLabel().trim());
         }
 
         return strLabels;
+    }
+
+    public void updateTask(Context context, Task pTask){
+        DaoSession daoSession = getDaoSession(context);
+        TaskDao taskDao = daoSession.getTaskDao();
+        taskDao.update(pTask);
     }
 }

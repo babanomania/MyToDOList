@@ -1,12 +1,15 @@
 package com.babanomania.mytodolist.core;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Color;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.TextView;
 
 import com.babanomania.mytodolist.R;
@@ -28,6 +31,7 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.MyViewHolder> 
     public class MyViewHolder extends RecyclerView.ViewHolder {
 
         public TextView title, label, date;
+        public CheckBox isCompleted;
         public View rowView;
 
         public MyViewHolder(View view) {
@@ -35,6 +39,7 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.MyViewHolder> 
             title = (TextView) view.findViewById(R.id.title);
             label = (TextView) view.findViewById(R.id.labels);
             date = (TextView) view.findViewById(R.id.date);
+            isCompleted = (CheckBox) view.findViewById(R.id.isCompleted);
             this.rowView = view;
         }
 
@@ -57,10 +62,11 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.MyViewHolder> 
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
 
-        Task task = tasksList.get(position);
+        final Task task = tasksList.get(position);
         holder.title.setText(task.getTitle());
         holder.label.setText( EntityUtil.getHashedLabels(task) );
         holder.date.setText( EntityUtil.getStringFromDate(task.getDate()));
+        holder.isCompleted.setChecked( task.getIsCompleted() );
 
         if( taskManager.isSelected(task) ){
 
@@ -74,6 +80,29 @@ public class MainAdapter extends RecyclerView.Adapter<MainAdapter.MyViewHolder> 
             holder.rowView.setSelected(false);
             Log.d( "MyTODOList", "NOT-SetSelected - " + task.getTitle() );
         }
+
+        holder.isCompleted.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(final View view) {
+
+                final boolean checked = ((CheckBox) view).isChecked();
+                AlertDialog.Builder builder = new AlertDialog.Builder(view.getContext());
+                builder
+                        .setTitle( checked ? "Complete task ?" : "Undo task completion ?")
+                        .setMessage("Are you sure?")
+                        .setIcon(android.R.drawable.ic_dialog_alert)
+                        .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+
+                                task.setIsCompleted(checked);
+                                taskManager.updateTask(view.getContext(), task);
+                            }
+                        })
+                        .setNegativeButton("No", null)						//Do nothing on no
+                        .show();
+            }
+        });
 
     }
 

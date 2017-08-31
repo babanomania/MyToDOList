@@ -34,6 +34,7 @@ public class TaskManager {
         today,
         this_week,
         this_month,
+        completed,
         LABELS;
     }
 
@@ -76,6 +77,12 @@ public class TaskManager {
                                             context,
                                             DateUtil.getThisMonthEndDate()
                                 ));
+
+            } else if( filterType.equals( Filters.completed ) ){
+                taskList.addAll(dbHandler.getTasksCompleted(
+                                            context
+                                    ));
+
             } else if( filterType.equals( Filters.LABELS ) ){
                 taskList.addAll(dbHandler.getTasksByLabel(
                                         context,
@@ -210,4 +217,14 @@ public class TaskManager {
     public Set<String> getLabels(Context context) {
         return dbHandler.getLabels(context);
     }
+
+    public void updateTask( Context context, Task pTask ){
+        dbHandler.updateTask(context, pTask);
+        taskList.remove(pTask);
+
+        if( mAdapter != null ){
+            mAdapter.notifyDataSetChanged();
+        }
+    }
+
 }

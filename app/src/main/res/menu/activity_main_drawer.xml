@@ -14,6 +14,11 @@
             android:id="@+id/nav_month"
             android:icon="@drawable/ic_menu_cal"
             android:title="This Month" />
+
+        <item
+            android:id="@+id/nav_completed"
+            android:icon="@drawable/ic_menu_done"
+            android:title="Completed" />
     </group>
 
     <!--<item android:title="Labels" android:id="@+id/nav_menu_labels">-->

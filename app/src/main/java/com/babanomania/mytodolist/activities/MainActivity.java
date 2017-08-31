@@ -211,6 +211,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             taskManager.filterData(this, TaskManager.Filters.this_month, null);
             titleActionMode = "Pending This Month";
 
+        } else if (id == R.id.nav_completed) {
+            taskManager.filterData(this, TaskManager.Filters.completed, null);
+            titleActionMode = "Completed";
+
         } else {
 
             String menuTitle = item.getTitle().toString();

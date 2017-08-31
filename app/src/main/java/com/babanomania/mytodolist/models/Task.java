@@ -29,6 +29,8 @@ public class Task {
 
     private Date date;
 
+    private boolean isCompleted;
+
     @ToMany
     @JoinEntity(
             entity = LabelTaskMap.class,
@@ -54,11 +56,12 @@ public class Task {
         this.date = date;
     }
 
-    @Generated(hash = 13131675)
-    public Task(Long _id, @NotNull String title, Date date) {
+    @Generated(hash = 781146968)
+    public Task(Long _id, @NotNull String title, Date date, boolean isCompleted) {
         this._id = _id;
         this.title = title;
         this.date = date;
+        this.isCompleted = isCompleted;
     }
 
     @Generated(hash = 733837707)
@@ -189,6 +192,14 @@ public class Task {
             throw new DaoException("Entity is detached from DAO context");
         }
         myDao.update(this);
+    }
+
+    public boolean getIsCompleted() {
+        return this.isCompleted;
+    }
+
+    public void setIsCompleted(boolean isCompleted) {
+        this.isCompleted = isCompleted;
     }
 
     /** called by internal mechanisms, do not call yourself. */
