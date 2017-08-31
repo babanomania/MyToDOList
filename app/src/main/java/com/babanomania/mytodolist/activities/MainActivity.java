@@ -1,40 +1,33 @@
 package com.babanomania.mytodolist.activities;
 
-import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ActionMode;
-import android.util.SparseBooleanArray;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.Toolbar;
-import android.view.MenuInflater;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.support.v7.widget.RecyclerView;
 import android.widget.Toast;
 
-import com.babanomania.mytodolist.persistance.DatabaseHandler;
 import com.babanomania.mytodolist.persistance.TaskManager;
-import com.babanomania.mytodolist.recycleViewUtil.ClickListener;
-import com.babanomania.mytodolist.recycleViewUtil.DividerItemDecoration;
+import com.babanomania.mytodolist.core.ClickListener;
+import com.babanomania.mytodolist.core.DividerItemDecoration;
 import com.babanomania.mytodolist.R;
-import com.babanomania.mytodolist.recycleViewUtil.RecyclerTouchListener;
-import com.babanomania.mytodolist.recycleViewUtil.TaskAdapter;
-import com.babanomania.mytodolist.models.TaskBean;
-import com.babanomania.mytodolist.recycleViewUtil.Toolbar_ActionMode_Callback;
-
-import java.util.ArrayList;
+import com.babanomania.mytodolist.core.RecyclerTouchListener;
+import com.babanomania.mytodolist.core.MainAdapter;
+import com.babanomania.mytodolist.models.Task;
+import com.babanomania.mytodolist.core.Toolbar_ActionMode_Callback;
 
 public class MainActivity extends AppCompatActivity {
 
     private RecyclerView mRecyclerView;
-    private TaskAdapter mAdapter;
+    private MainAdapter mAdapter;
     private RecyclerView.LayoutManager mLayoutManager;
 
     private static TaskManager taskManager = TaskManager.getInstance();
@@ -49,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
 
         mRecyclerView = (RecyclerView) findViewById(R.id.rv_todo_list);
 
-        mAdapter = new TaskAdapter(taskManager.getTaskList(getBaseContext()));
+        mAdapter = new MainAdapter(taskManager.getTaskList(getBaseContext()));
         taskManager.setAdapter(mAdapter);
 
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getApplicationContext());
@@ -64,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view, int position) {
 
                 if( mActionMode == null ) {
-                    TaskBean task = taskManager.get(position);
+                    Task task = taskManager.get(position);
                     Toast.makeText(getApplicationContext(), task.getTitle() + " is selected!", Toast.LENGTH_SHORT).show();
                 }
             }
@@ -84,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(view.getContext(), AddTasksActivity.class);
+                Intent intent = new Intent(view.getContext(), NewTaskActivity.class);
                 startActivity(intent);
             }
         });

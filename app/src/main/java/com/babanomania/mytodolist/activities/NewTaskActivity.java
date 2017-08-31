@@ -11,16 +11,19 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 
 import com.babanomania.mytodolist.R;
-import com.babanomania.mytodolist.models.TaskBean;
+import com.babanomania.mytodolist.models.Label;
+import com.babanomania.mytodolist.models.Task;
 import com.babanomania.mytodolist.persistance.TaskManager;
+import com.babanomania.mytodolist.util.EntityUtil;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class AddTasksActivity extends AppCompatActivity {
+public class NewTaskActivity extends AppCompatActivity {
 
     private Pattern pattern;
     private Matcher matcher;
@@ -34,7 +37,7 @@ public class AddTasksActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_tasks);
+        setContentView(R.layout.activity_new_task);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -70,14 +73,14 @@ public class AddTasksActivity extends AppCompatActivity {
             public void onClick(View view) {
 
                 final EditText edTitle = (EditText) findViewById(R.id.newtitle);
-                final EditText edDesc = (EditText) findViewById(R.id.newlabels);
                 final EditText edDate = (EditText) findViewById(R.id.newDate);
+                Task newTask = new Task( edTitle.getText().toString(),
+                                         EntityUtil.getDateFromString( edDate.getText().toString() ) );
 
-                taskManager.addTask( new TaskBean(   edTitle.getText().toString(),
-                                                    edDesc.getText().toString() ,
-                                                    edDate.getText().toString() ),
-                                    view.getContext()
-                        );
+                final EditText edLabel = (EditText) findViewById(R.id.newlabels);
+                List<Label> labels = EntityUtil.getLabelsFromString(edLabel.getText().toString());
+
+                taskManager.addTask( newTask, labels, view.getContext() );
 
                 finish();
 

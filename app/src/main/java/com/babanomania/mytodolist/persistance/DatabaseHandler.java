@@ -7,209 +7,146 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import com.babanomania.mytodolist.models.TaskBean;
+import com.babanomania.mytodolist.models.DaoMaster;
+import com.babanomania.mytodolist.models.DaoSession;
+import com.babanomania.mytodolist.models.Label;
+import com.babanomania.mytodolist.models.LabelDao;
+import com.babanomania.mytodolist.models.LabelTaskMap;
+import com.babanomania.mytodolist.models.LabelTaskMapDao;
+import com.babanomania.mytodolist.models.Task;
+import com.babanomania.mytodolist.models.TaskDao;
+
+import org.greenrobot.greendao.database.Database;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Shouvik on 23/08/2017.
  */
 
-public class DatabaseHandler extends SQLiteOpenHelper {
+public class DatabaseHandler {
 
-    private static final int DATABASE_VERSION = 1;
-    private static final String DATABASE_NAME = "MyTODOList";
-
-    private static final String TABLE_TASKS = "T_TD_TASKS";
-    private static final String TABLE_LABELS = "T_TD_LABELS";
-
-    private static final String KEY_ID = "id";
-    private static final String KEY_TITLE = "title";
-    private static final String KEY_DATE = "date";
-
-    private static final String KEY_TASK_ID = "task_id";
-    private static final String KEY_LABEL = "label";
-
-
-    public DatabaseHandler(Context context) {
-        super(context, DATABASE_NAME, null, DATABASE_VERSION);
+    private DaoSession getDaoSession(Context context){
+        DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(context, "mytodo-db");
+        Database db = helper.getWritableDb();
+        return new DaoMaster(db).newSession();
     }
 
-    @Override
-    public void onCreate(SQLiteDatabase db) {
-        String CREATE_TASKS_TABLE = "CREATE TABLE " + TABLE_TASKS + " ("
-                + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-                + KEY_TITLE + " TEXT, "
-                + KEY_DATE + " TEXT )";
+    public List<Task> getTasks(Context context){
 
-        String CREATE_LABELS_TABLE = "CREATE TABLE " + TABLE_LABELS + " ("
-                + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
-                + KEY_TASK_ID + " INTEGER, "
-                + KEY_LABEL + " TEXT )";
-
-        Log.d("MYTODDOLIST", CREATE_TASKS_TABLE );
-        Log.d("MYTODDOLIST", CREATE_LABELS_TABLE );
-        db.execSQL(CREATE_TASKS_TABLE);
-        db.execSQL(CREATE_LABELS_TABLE);
+        DaoSession daoSession = getDaoSession(context);
+        TaskDao taskDao = daoSession.getTaskDao();
+        return taskDao.queryBuilder().list();
     }
 
-    @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // Drop older table if existed
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_TASKS);
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_LABELS);
 
-        // Create tables again
-        onCreate(db);
-    }
+    public void addTask(Task task, List<Label> labels, Context context){
 
-    public void addTask(TaskBean task) {
+        DaoSession daoSession = getDaoSession(context);
+        daoSession.getDatabase().beginTransaction();
 
-        SQLiteDatabase db = this.getWritableDatabase();
-
-        ContentValues values = new ContentValues();
-        values.put(KEY_TITLE, task.getTitle());
-        values.put(KEY_DATE, task.getDate());
-
-        // Inserting Row
-        long taskId = db.insert(TABLE_TASKS, null, values);
-        int iTaskId = Long.valueOf(taskId).intValue();
-
-        List<String> labels = task.getLabels();
-        List<Integer> labelsIds = addLabels(db, iTaskId, labels);
-
-        db.close(); // Closing database connection
-
-    }
-
-    public void addTask( List<TaskBean> taskList) {
-
-        SQLiteDatabase db = this.getWritableDatabase();
-
-        for (TaskBean task: taskList) {
-
-            ContentValues values = new ContentValues();
-            values.put(KEY_TITLE, task.getTitle());
-            values.put(KEY_DATE, task.getDate());
-
-            // Inserting Row
-            long taskId = db.insert(TABLE_TASKS, null, values);
-            int iTaskId = Long.valueOf(taskId).intValue();
-
-            List<String> labels = task.getLabels();
-            List<Integer> labelsIds = addLabels(db, iTaskId, labels);
+        LabelDao labelDao = daoSession.getLabelDao();
+        for( Label eachLabel : labels ) {
+            labelDao.insertOrReplace(eachLabel);
         }
 
-        db.close(); // Closing database connection
+        TaskDao taskDao = daoSession.getTaskDao();
+        taskDao.save(task);
 
-    }
+        LabelTaskMapDao labelTaskMapDao = daoSession.getLabelTaskMapDao();
+        List<LabelTaskMap> labelTaskMapList = new ArrayList<LabelTaskMap>();
 
-    public List<Integer> addLabels( SQLiteDatabase db, int taskId, List<String> pLabels ){
-
-        List<Integer> labelIds = new ArrayList<Integer>();
-
-        for (String label: pLabels) {
-            ContentValues values = new ContentValues();
-            values.put(KEY_TASK_ID, taskId);
-            values.put(KEY_LABEL, label);
-
-            long labelId = db.insert( TABLE_LABELS, null, values );
-            labelIds.add( Long.valueOf(labelId).intValue() );
+        for( Label eachLabel : labels ){
+            LabelTaskMap labelTaskMap = new LabelTaskMap();
+            labelTaskMap.setTaskId( task.get_id() );
+            labelTaskMap.setLabelId(eachLabel.get_id());
+            labelTaskMapList.add(labelTaskMap);
+            labelTaskMapDao.insert(labelTaskMap);
         }
 
-        return labelIds;
+        task.setCachedLabels( labels );
+
+        daoSession.getDatabase().setTransactionSuccessful();
+        daoSession.getDatabase().endTransaction();
     }
 
-    public List<String> getLabels( SQLiteDatabase db, int taskId ){
+    public void addTask(Context context, Map<Task, List<Label>> tasks){
 
-        List<String> labels = new ArrayList<String>();
+        DaoSession daoSession = getDaoSession(context);
+        daoSession.getDatabase().beginTransaction();
 
-        Cursor cursorLabels = db.query(TABLE_LABELS,
-                new String[] { KEY_LABEL }, KEY_TASK_ID + "=?",
-                new String[] { String.valueOf(taskId) }, null, null, null, null);
+        for ( Task task : tasks.keySet() ) {
 
-        if (cursorLabels.moveToFirst()) {
-            do {
+            List<Label> labels = tasks.get(task);
 
-                labels.add( cursorLabels.getString(0) );
+            LabelDao labelDao = daoSession.getLabelDao();
+            for (Label eachLabel : labels) {
+                labelDao.insertOrReplace(eachLabel);
+            }
 
-            } while (cursorLabels.moveToNext());
+            TaskDao taskDao = daoSession.getTaskDao();
+            taskDao.save(task);
+
+            LabelTaskMapDao labelTaskMapDao = daoSession.getLabelTaskMapDao();
+            List<LabelTaskMap> labelTaskMapList = new ArrayList<LabelTaskMap>();
+
+            for (Label eachLabel : labels) {
+                LabelTaskMap labelTaskMap = new LabelTaskMap();
+                labelTaskMap.setTaskId(task.get_id());
+                labelTaskMap.setLabelId(eachLabel.get_id());
+                labelTaskMapList.add(labelTaskMap);
+                labelTaskMapDao.insert(labelTaskMap);
+            }
+
+            task.setCachedLabels( labels );
         }
 
-        cursorLabels.close();
-        return labels;
+        daoSession.getDatabase().setTransactionSuccessful();
+        daoSession.getDatabase().endTransaction();
     }
 
-    public TaskBean getTask(int id) {
+    public void deleteTask( Context context, Task task ){
+        DaoSession daoSession = getDaoSession(context);
+        daoSession.getDatabase().beginTransaction();
 
-        SQLiteDatabase db = this.getReadableDatabase();
+        daoSession.getLabelTaskMapDao()
+                    .queryBuilder()
+                    .where(LabelTaskMapDao.Properties.TaskId.eq( task.get_id() ))
+                    .buildDelete()
+                    .executeDeleteWithoutDetachingEntities();
 
-        Cursor cursor = db.query(TABLE_TASKS,
-                new String[] { KEY_ID, KEY_TITLE, KEY_DATE }, KEY_ID + "=?",
-                new String[] { String.valueOf(id) }, null, null, null, null);
+        daoSession.getTaskDao()
+                    .delete(task);
 
-        if (cursor != null)
-            cursor.moveToFirst();
-
-        int taskId = Integer.parseInt(cursor.getString(0));
-        String taskTitle = cursor.getString(1);
-        String taskDate = cursor.getString(2);
-        List<String> labels = getLabels( db, taskId );
-
-        cursor.close();
-
-        TaskBean task = new TaskBean( taskId, taskTitle, labels, taskDate);
-
-        // return contact
-        return task;
-    }
-
-    public List<TaskBean> getAllTasks() {
-        List<TaskBean> tasksList = new ArrayList<TaskBean>();
-
-        // Select All Query
-        String selectQuery = "SELECT  * FROM " + TABLE_TASKS;
-
-        SQLiteDatabase db = this.getWritableDatabase();
-        Cursor cursor = db.rawQuery(selectQuery, null);
-
-        // looping through all rows and adding to list
-        if (cursor.moveToFirst()) {
-            do {
-
-                int taskId = Integer.parseInt(cursor.getString(0));
-                String taskTitle = cursor.getString(1);
-                String taskDate = cursor.getString(2);
-                List<String> labels = getLabels( db, taskId );
-
-                TaskBean task = new TaskBean( taskId, taskTitle, labels, taskDate);
-
-                // Adding contact to list
-                tasksList.add(task);
-
-            } while (cursor.moveToNext());
+        List<Long> allLabelIds = new ArrayList<Long>();
+        for( LabelTaskMap lblTskMap : daoSession.getLabelTaskMapDao().queryBuilder().list() ){
+            allLabelIds.add( lblTskMap.get_id() );
         }
 
-        cursor.close();
+        daoSession.getLabelDao()
+                    .queryBuilder()
+                    .where( LabelDao.Properties._id.notIn(
+                            allLabelIds
+                    ) )
+                    .buildDelete()
+                    .executeDeleteWithoutDetachingEntities();
 
-        // return contact list
-        return tasksList;
+        daoSession.getDatabase().setTransactionSuccessful();
+        daoSession.getDatabase().endTransaction();
     }
 
-    public void deleteTask(TaskBean task) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        db.delete(TABLE_TASKS, KEY_ID + " = ?",
-                new String[] { String.valueOf(task.get_id()) });
+    public void deleteAll(Context context){
 
-        db.close();
+        DaoSession daoSession = getDaoSession(context);
+        daoSession.getDatabase().beginTransaction();
+        daoSession.getLabelTaskMapDao().deleteAll();
+        daoSession.getLabelDao().deleteAll();
+        daoSession.getTaskDao().deleteAll();
+        daoSession.getDatabase().setTransactionSuccessful();
+        daoSession.getDatabase().endTransaction();
+
+
     }
-
-    public void deleteAllTasks(){
-        SQLiteDatabase db = this.getWritableDatabase();
-        db.delete(TABLE_TASKS, null, null);
-
-        db.close();
-    }
-
 }

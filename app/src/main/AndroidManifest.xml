@@ -22,7 +22,7 @@
         </activity>
 
         <activity
-            android:name=".activities.AddTasksActivity"
+            android:name=".activities.NewTaskActivity"
             android:label="@string/title_activity_add_tasks"
             android:theme="@style/AppTheme.NoActionBar">
 

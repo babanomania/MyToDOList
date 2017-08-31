@@ -1,4 +1,4 @@
-package com.babanomania.mytodolist.recycleViewUtil;
+package com.babanomania.mytodolist.core;
 
 import android.view.View;
 

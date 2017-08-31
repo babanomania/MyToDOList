@@ -1,4 +1,4 @@
-package com.babanomania.mytodolist.recycleViewUtil;
+package com.babanomania.mytodolist.core;
 
 import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
@@ -9,8 +9,9 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.babanomania.mytodolist.R;
-import com.babanomania.mytodolist.models.TaskBean;
+import com.babanomania.mytodolist.models.Task;
 import com.babanomania.mytodolist.persistance.TaskManager;
+import com.babanomania.mytodolist.util.EntityUtil;
 
 import java.util.List;
 
@@ -18,27 +19,27 @@ import java.util.List;
  * Created by Shouvik on 23/08/2017.
  */
 
-public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.MyViewHolder> {
+public class MainAdapter extends RecyclerView.Adapter<MainAdapter.MyViewHolder> {
 
-    private List<TaskBean> tasksList;
+    private List<Task> tasksList;
     private TaskManager taskManager = TaskManager.getInstance();
 
     public class MyViewHolder extends RecyclerView.ViewHolder {
 
-        public TextView title, desc, date;
+        public TextView title, label, date;
         public View rowView;
 
         public MyViewHolder(View view) {
             super(view);
             title = (TextView) view.findViewById(R.id.title);
-            desc = (TextView) view.findViewById(R.id.labels);
+            label = (TextView) view.findViewById(R.id.labels);
             date = (TextView) view.findViewById(R.id.date);
             this.rowView = view;
         }
 
     }
 
-    public TaskAdapter(List<TaskBean> pTasksList) {
+    public MainAdapter(List<Task> pTasksList) {
         this.tasksList = pTasksList;
     }
 
@@ -47,7 +48,7 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.MyViewHolder> 
 
         View itemView = LayoutInflater
                             .from(parent.getContext())
-                            .inflate(R.layout.task_list_row, parent, false);
+                            .inflate(R.layout.task_row, parent, false);
 
         return new MyViewHolder(itemView);
     }
@@ -55,10 +56,10 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.MyViewHolder> 
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
 
-        TaskBean task = tasksList.get(position);
+        Task task = tasksList.get(position);
         holder.title.setText(task.getTitle());
-        holder.desc.setText(task.getHashedLabels());
-        holder.date.setText(task.getDate());
+        holder.label.setText( EntityUtil.getHashedLabels(task) );
+        holder.date.setText( EntityUtil.getStringFromDate(task.getDate()));
 
         if( taskManager.isSelected(task) ){
 

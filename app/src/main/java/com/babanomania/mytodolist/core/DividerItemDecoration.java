@@ -1,4 +1,4 @@
-package com.babanomania.mytodolist.recycleViewUtil;
+package com.babanomania.mytodolist.core;
 
 import android.content.Context;
 import android.content.res.TypedArray;

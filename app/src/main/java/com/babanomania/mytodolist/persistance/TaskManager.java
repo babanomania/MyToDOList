@@ -4,10 +4,22 @@ import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.widget.Toast;
 
-import com.babanomania.mytodolist.models.TaskBean;
+import com.babanomania.mytodolist.models.DaoMaster;
+import com.babanomania.mytodolist.models.DaoSession;
+import com.babanomania.mytodolist.models.Label;
+import com.babanomania.mytodolist.models.LabelDao;
+import com.babanomania.mytodolist.models.LabelTaskMap;
+import com.babanomania.mytodolist.models.LabelTaskMapDao;
+import com.babanomania.mytodolist.models.Task;
+import com.babanomania.mytodolist.models.TaskDao;
+import com.babanomania.mytodolist.util.EntityUtil;
+
+import org.greenrobot.greendao.database.Database;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Shouvik on 23/08/2017.
@@ -15,62 +27,59 @@ import java.util.List;
 
 public class TaskManager {
 
-    private List<TaskBean> taskList = new ArrayList<TaskBean>();
+    private List<Task> taskList = new ArrayList<Task>();
     private static TaskManager instance = new TaskManager();
     private RecyclerView.Adapter mAdapter;
 
-    private static List<TaskBean> selectedTasks = new ArrayList<TaskBean>();
+    private static List<Task> selectedTasks = new ArrayList<Task>();
+
+    private DatabaseHandler dbHandler = new DatabaseHandler();
 
     public static TaskManager getInstance() {
         return instance;
     }
 
-    public List<TaskBean> getTaskList(Context context) {
+    public List<Task> getTaskList(Context context) {
 
-        DatabaseHandler db = new DatabaseHandler(context);
-        taskList.clear();
-        taskList.addAll( db.getAllTasks() );
+        synchronized (this) {
+            taskList.clear();
+            taskList.addAll(dbHandler.getTasks(context));
+        }
 
         return taskList;
     }
 
-    public List<TaskBean> getTaskListOnly(Context context) {
+    public List<Task> getTaskListOnly(Context context) {
         return taskList;
     }
 
-    public void addTask(TaskBean task, Context context){
+    public void addTask(Task task, List<Label> labels, Context context){
 
         taskList.add(task);
-
-        DatabaseHandler db = new DatabaseHandler(context);
-        db.addTask(task);
+        dbHandler.addTask( task, labels, context );
 
         if( mAdapter != null ){
             mAdapter.notifyItemInserted( taskList.size() - 1 );
-           // mAdapter.notifyDataSetChanged();
         }
     }
 
-    public void addTask(Context context, List<TaskBean> tasks){
+    public void addTask(Context context, Map<Task, List<Label>>  tasks){
 
-        taskList.addAll(tasks);
-
-        DatabaseHandler db = new DatabaseHandler(context);
-        db.addTask(tasks);
+        taskList.addAll(tasks.keySet());
+        dbHandler.addTask( context, tasks );
 
         if( mAdapter != null ){
             mAdapter.notifyDataSetChanged();
         }
     }
 
-    public TaskBean get(int position){
+    public Task get(int position){
         return taskList.get(position);
     }
 
     public void deleteTask( int position, Context context){
 
-        DatabaseHandler db = new DatabaseHandler(context);
-        db.deleteTask( taskList.get(position) );
+        dbHandler.deleteTask( context, taskList.get(position) );
         taskList.remove(position);
 
         if( mAdapter != null ){
@@ -81,9 +90,8 @@ public class TaskManager {
 
     public void deleteAllTasks( Context context){
 
-        DatabaseHandler db = new DatabaseHandler(context);
-        db.deleteAllTasks();
         taskList.clear();
+        dbHandler.deleteAll(context);
 
         if( mAdapter != null ){
             mAdapter.notifyDataSetChanged();
@@ -96,20 +104,36 @@ public class TaskManager {
 
     public void addSampleData(Context context) {
 
-        List<TaskBean> tasksList = new ArrayList<TaskBean>();
+        Map<Task, List<Label>>  tasks = new HashMap<Task, List<Label>>();
 
-        tasksList.add(new TaskBean("Create an todo app", "ToDo", "17/08/2017"));
-        tasksList.add(new TaskBean("Tell others to use this todo app", "ToDo", "28/08/2017"));
-        tasksList.add(new TaskBean("Make plans for a mind control device", "EvilPlan, Future", "01/01/2021"));
-        tasksList.add(new TaskBean("Create the mind control device", "EvilPlan, Future", "31/12/2021"));
-        tasksList.add(new TaskBean("Use the mind control device to rule the world", "EvilPlan, RuleTheWorld", "01/01/2022"));
+        Task task1 = new Task("Create an todo app", EntityUtil.getDateFromString("17/08/2017") );
+        List<Label> labels1 = new ArrayList<Label>();
+        labels1.add(new Label("todo"));
+        tasks.put(task1, labels1);
 
-        addTask(context, tasksList);
+        Task task2 = new Task("Tell others to use this todo app", EntityUtil.getDateFromString("28/08/2017") );
+        List<Label> labels2 = new ArrayList<Label>();
+        labels2.add(new Label("todo"));
+        tasks.put(task2, labels2);
+
+        Task task3 = new Task("Make plans for a mind control device", EntityUtil.getDateFromString("01/01/2021") );
+        List<Label> labels3 = EntityUtil.getLabelsFromString("EvilPlan, Future");
+        tasks.put(task3, labels3);
+
+        Task task4 = new Task("Create the mind control device", EntityUtil.getDateFromString("31/12/2021") );
+        List<Label> labels4 = EntityUtil.getLabelsFromString("EvilPlan, Future");
+        tasks.put(task4, labels4);
+
+        Task task5 = new Task("Use the mind control device to rule the world", EntityUtil.getDateFromString("01/01/2022") );
+        List<Label> labels5 = EntityUtil.getLabelsFromString("EvilPlan, RuleTheWorld");
+        tasks.put(task5, labels5);
+
+        addTask(context, tasks);
     }
 
     public void toggleSelection(int position){
 
-        TaskBean taskBeanSel = taskList.get(position);
+        Task taskBeanSel = taskList.get(position);
         if( selectedTasks.contains(taskBeanSel) ){
             selectedTasks.remove( selectedTasks.indexOf(taskBeanSel) );
             return;
@@ -126,10 +150,8 @@ public class TaskManager {
 
     public void deleteSelectedRows( Context context ){
 
-        DatabaseHandler db = new DatabaseHandler(context);
-
-        for( TaskBean selTask : selectedTasks ) {
-            db.deleteTask(selTask);
+        for( Task selTask : selectedTasks ) {
+            dbHandler.deleteTask(context, selTask);
             taskList.remove(taskList.indexOf(selTask));
         }
 
@@ -139,7 +161,7 @@ public class TaskManager {
         Toast.makeText( context, selectedSize + " item deleted.", Toast.LENGTH_SHORT).show();//Show Toast
     }
 
-    public boolean isSelected( TaskBean someBean ){
+    public boolean isSelected( Task someBean ){
         return selectedTasks.contains(someBean);
     }
 

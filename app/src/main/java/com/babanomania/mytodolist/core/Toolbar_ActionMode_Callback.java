@@ -1,18 +1,14 @@
-package com.babanomania.mytodolist.recycleViewUtil;
+package com.babanomania.mytodolist.core;
 
 import android.content.Context;
-import android.os.Build;
-import android.support.v4.view.MenuItemCompat;
 import android.support.v7.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import com.babanomania.mytodolist.R;
 import com.babanomania.mytodolist.activities.MainActivity;
-import com.babanomania.mytodolist.models.TaskBean;
+import com.babanomania.mytodolist.models.Task;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -22,12 +18,12 @@ import java.util.List;
 public class Toolbar_ActionMode_Callback implements ActionMode.Callback {
 
     private Context context;
-    private TaskAdapter recyclerView_adapter;
-    private List<TaskBean> message_models;
+    private MainAdapter recyclerView_adapter;
+    private List<Task> message_models;
     private boolean isListViewFragment;
 
-    public Toolbar_ActionMode_Callback(Context context, TaskAdapter recyclerView_adapter,
-                                       List<TaskBean> message_models, boolean isListViewFragment) {
+    public Toolbar_ActionMode_Callback(Context context, MainAdapter recyclerView_adapter,
+                                       List<Task> message_models, boolean isListViewFragment) {
         this.context = context;
         this.recyclerView_adapter = recyclerView_adapter;
         this.message_models = message_models;
