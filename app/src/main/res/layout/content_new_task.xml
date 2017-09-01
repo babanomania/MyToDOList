@@ -20,7 +20,12 @@
             android:id="@+id/newtitle"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:drawableLeft="@drawable/ic_menu_title"
+            android:drawableStart="@drawable/ic_menu_title"
+            android:drawablePadding="20dp"
             android:layout_marginTop="150px"
+            android:layout_marginLeft="50px"
+            android:layout_marginRight="100px"
             android:hint="Title *" />
 
     </android.support.design.widget.TextInputLayout>
@@ -36,7 +41,12 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="150px"
-            android:hint="Deadline (dd/mm/yyyy) *"
+            android:drawableLeft="@drawable/ic_menu_cal"
+            android:drawableStart="@drawable/ic_menu_cal"
+            android:drawablePadding="20dp"
+            android:layout_marginLeft="50px"
+            android:layout_marginRight="100px"
+            android:hint="Date *"
             tools:enabled="@bool/readonly_text" />
 
     </android.support.design.widget.TextInputLayout>
@@ -52,24 +62,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="150px"
-            android:hint="Labels ( e.g. todo, bucketlist ) *" />
+            android:drawableLeft="@drawable/ic_menu_label"
+            android:drawableStart="@drawable/ic_menu_label"
+            android:drawablePadding="20dp"
+            android:layout_marginLeft="50px"
+            android:layout_marginRight="100px"
+            android:hint="Labels" />
 
     </android.support.design.widget.TextInputLayout>
-
-    <Button
-        android:id="@+id/save"
-        style="@style/Widget.AppCompat.Button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="300px"
-        android:layout_marginStart="300px"
-        android:layout_marginTop="50px"
-        android:background="@color/colorPrimary"
-        android:paddingBottom="50px"
-        android:paddingTop="50px"
-        android:text="Save"
-        android:textColor="@android:color/background_light"
-        android:textSize="18sp" />
-
 
 </LinearLayout>

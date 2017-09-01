@@ -1,9 +1,13 @@
 <resources>
     <string name="app_name">My TODO List</string>
+
+    <string name="title_activity_main">My TODO List</string>
     <string name="action_remove_all">Remove All Tasks</string>
     <string name="action_add_test_data">Add Test Data</string>
-    <string name="menu_item_delete">Delete</string>
-    <string name="title_activity_add_tasks">Add New Task</string>
+    <string name="action_item_delete">Delete</string>
+
+    <string name="title_activity_new_task">New Task</string>
+    <string name="action_save">Save</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
